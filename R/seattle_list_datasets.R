@@ -64,3 +64,4 @@ seattle_list_datasets <- function() {
     dplyr::distinct(.data$uid, .keep_all = TRUE) |>
     dplyr::relocate("key", "uid", "name")
 }
+

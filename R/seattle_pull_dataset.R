@@ -73,7 +73,7 @@
 #' @examples
 #' if (interactive() && curl::has_internet()) {
 #'   # Pull by human-readable key
-#'   seattle_pull_dataset("Seattle Pet Licenses", limit = 3)
+#'   seattle_pull_dataset("seattle_pet_licenses", limit = 3)
 #'
 #'   # Pull by Socrata UID
 #'   seattle_pull_dataset("jguv-t9rb", limit = 3)

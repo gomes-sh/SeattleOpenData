@@ -1,0 +1,315 @@
+---
+output: github_document
+---
+
+# SeattleOpenData <img src="man/figures/cityOpenData_hex.png" alt="seattleOpenData logo" width="72" align="right" />
+
+[![CRAN downloads](https://cranlogs.r-pkg.org/badges/grand-total/SeattleOpenData?color=blue)](https://r-pkg.org/pkg/SeattleOpenData)
+[![Lifecycle: stable](https://img.shields.io/badge/lifecycle-stable-brightgreen.svg)](https://lifecycle.r-lib.org/articles/stages.html)
+[![Project Status: Active](https://www.repostatus.org/badges/latest/active.svg)](https://www.repostatus.org/#active)
+[![R-CMD-check](https://github.com/gomes-sh/seattleOpenData/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/gomes-sh/seattleOpenData/actions/workflows/R-CMD-check.yaml)
+
+`SeattleOpenData` provides a lightweight R interface to the
+[Seattle Open Data Portal](https://data.seattle.gov/).
+
+The package allows users to search, filter, and download datasets from the
+Seattle Open Data Portal directly into R without manually constructing API
+queries, handling JSON responses, or performing type conversion.
+
+Designed for students, educators, researchers, journalists, civic
+technologists, and analysts, `SeattleOpenData` reduces the technical overhead
+required to begin working with municipal Open Data while preserving access to
+the underlying Socrata infrastructure.
+
+---
+
+## How `SeattleOpenData` Works
+
+The package provides a streamlined interface to the Seattle Open Data
+Portal's Socrata API.
+
+Internally, `seattleOpenData`:
+
+- retrieves metadata from the live Seattle Open Data catalog
+- constructs parameterized HTTP requests
+- downloads JSON responses from Socrata endpoints
+- converts results into tidy tibble outputs
+- optionally cleans column names
+- optionally performs conservative type coercion
+
+Most workflows begin with `seattle_list_datasets()`, which retrieves a live catalog
+of datasets available through the Seattle Open Data Portal.
+
+Datasets can then be downloaded using either:
+
+- a human-readable catalog `key`
+- the official Socrata dataset UID, such as `"jguv-t9rb"`
+
+The human-readable key is designed to improve readability and usability, while
+the UID is the stable identifier used by the Socrata platform.
+
+## Core Functions
+
+The package provides three primary functions:
+
+- `seattle_list_datasets()` retrieves a live catalog of available Seattle Open
+  Data datasets, including human-readable keys, Socrata UIDs, names, and other
+  available metadata.
+
+- `seattle_pull_dataset()` downloads cataloged datasets using either a
+  human-readable key or Socrata UID, with support for filtering, ordering, date
+  ranges, optional column-name cleaning, and optional type coercion.
+
+- `seattle_any_dataset()` downloads data directly from a valid Socrata JSON
+  endpoint without requiring the dataset to appear in the package catalog.
+
+Datasets retrieved through `seattle_pull_dataset()` support arguments including:
+
+- `limit`
+- `filters`
+- `date`
+- `from`
+- `to`
+- `date_field`
+- `where`
+- `order`
+- `clean_names`
+- `coerce_types`
+
+All functions return tibble outputs.
+
+Advanced users may also provide raw SoQL conditions through the `where`
+argument.
+
+SoQL, or Socrata Query Language, is the query syntax used by Socrata-powered
+Open Data portals. Additional information is available from the
+[Socrata developer documentation](https://dev.socrata.com/docs/queries/).
+
+---
+
+## Installation
+
+### Install from CRAN
+
+```r
+install.packages("seattleOpenData")
+```
+
+### Install the development version from GitHub
+
+```r
+# install.packages("pak")
+pak::pak("gomes-sh/seattleOpenData")
+```
+
+Alternatively:
+
+```r
+# install.packages("remotes")
+remotes::install_github("gomes-sh/seattleOpenData")
+```
+
+---
+
+## Example
+
+```text
+library(seattleOpenData)
+library(dplyr)
+
+# Browse available datasets
+catalog <- seattle_list_datasets()
+
+# Search for datasets containing a keyword
+catalog |>
+  filter(grepl("Pet", name, ignore.case = TRUE)) |>
+  select(key, uid, name)
+
+# Pull a dataset using its UID
+example_data <- seattle_pull_dataset(
+  dataset = "jguv-t9rb",
+  limit = 100
+)
+
+# Pull the same dataset using its catalog key
+example_data_by_key <- seattle_pull_dataset(
+  dataset = "seattle_pet_licenses",
+  limit = 100
+)
+
+# Pull filtered data
+filtered_data <- seattle_pull_dataset(
+  dataset = "jguv-t9rb",
+  limit = 100,
+  filters = list(
+    primary_breed = "Domestic Shorthair"
+  )
+)
+```
+
+The `filters` argument accepts a named list and automatically constructs the
+corresponding SoQL filtering conditions.
+
+Multiple values may be supplied for one field:
+
+```text
+filtered_data <- seattle_pull_dataset(
+  dataset = "jguv-t9rb",
+  limit = 100,
+  filters = list(
+    primary_breed = c("Domestic Shorthair", "Domestic Medium Hair")
+  )
+)
+```
+
+Multiple fields may also be combined:
+
+```text
+filtered_data <- seattle_pull_dataset(
+  dataset = "jguv-t9rb",
+  limit = 100,
+  filters = list(
+    species = "Dog",
+    secondary_breed = "Mix"
+  )
+)
+```
+
+Date filtering is available for datasets containing date or datetime fields:
+
+```text
+date_filtered_data <- seattle_pull_dataset(
+  dataset = "jguv-t9rb",
+  from = "2023-01-01",
+  to = "2024-01-01",
+  date_field = "license_issue_date",
+  limit = 100
+)
+```
+
+---
+
+## Accessing Any Socrata Endpoint
+
+When a dataset is not available through `seattle_list_datasets()`, it can be
+downloaded directly using `seattle_any_dataset()`.
+
+```text
+endpoint_data <- seattle_any_dataset(
+  json_link = "https://data.seattle.gov/resource/jguv-t9rb.json",
+  limit = 100
+)
+```
+
+Use `seattle_pull_dataset()` for catalog-based workflows and
+`seattle_any_dataset()` when working directly with a Socrata JSON endpoint.
+
+---
+
+## Learn by Example
+
+A complete introductory workflow is available in the package vignette:
+
+```r
+vignette("getting-started", package = "seattleOpenData")
+```
+
+The vignette demonstrates how to:
+
+- browse the dataset catalog
+- download data using a key or UID
+- filter records
+- work with date ranges
+- access direct JSON endpoints
+- perform a simple analysis
+
+---
+
+## Package Website
+
+Complete documentation is available on the package website:
+
+<https://github.com/gomes-sh/SeattleOpenData>
+
+The website includes:
+
+- function reference pages
+- installation instructions
+- introductory articles
+- vignettes
+- release notes
+
+---
+
+## Development
+
+To run the package tests locally:
+
+```r
+devtools::test()
+```
+
+To rebuild the documentation:
+
+```r
+devtools::document()
+```
+
+To run a complete package check:
+
+```r
+devtools::check()
+```
+
+To rebuild the pkgdown website:
+
+```r
+pkgdown::build_site()
+```
+
+---
+
+## Contributing
+
+Contributions are welcome.
+
+To report a bug, request a feature, or suggest an improvement, open an issue on
+GitHub:
+
+<https://github.com/gomes-sh/seattleOpenData/issues>
+
+Pull requests are also welcome. Before submitting a pull request, please ensure
+that:
+
+- package documentation has been regenerated
+- automated tests pass
+- `devtools::check()` completes successfully
+- new behavior is documented and tested
+
+---
+
+## Author
+
+**YOUR_NAME**
+
+Email: [gomessh@mailbox.org](mailto:gomessh@mailbox.org)  
+GitHub: [@gomes-sh](https://github.com/gomes-sh)  
+
+---
+
+## Maintenance
+
+Because the package retrieves metadata dynamically from the live Seattle Open
+Data catalog, newly published datasets may become available without requiring a
+package update.
+
+Package updates may still be required when the portal changes its catalog
+structure, dataset metadata fields, or API behavior.
+
+---
+
+## Disclaimer
+
+`seattleOpenData` is an independent project and is not affiliated with, endorsed
+by, or maintained by Seattle or the organization responsible for the Seattle
+Open Data Portal.
