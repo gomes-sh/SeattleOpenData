@@ -2,12 +2,12 @@
 output: github_document
 ---
 
-# SeattleOpenData <img src="man/figures/cityOpenData_hex.png" alt="seattleOpenData logo" width="72" align="right" />
+# SeattleOpenData
 
 [![CRAN downloads](https://cranlogs.r-pkg.org/badges/grand-total/SeattleOpenData?color=blue)](https://r-pkg.org/pkg/SeattleOpenData)
 [![Lifecycle: stable](https://img.shields.io/badge/lifecycle-stable-brightgreen.svg)](https://lifecycle.r-lib.org/articles/stages.html)
 [![Project Status: Active](https://www.repostatus.org/badges/latest/active.svg)](https://www.repostatus.org/#active)
-[![R-CMD-check](https://github.com/gomes-sh/seattleOpenData/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/gomes-sh/seattleOpenData/actions/workflows/R-CMD-check.yaml)
+
 
 `SeattleOpenData` provides a lightweight R interface to the
 [Seattle Open Data Portal](https://data.seattle.gov/).
