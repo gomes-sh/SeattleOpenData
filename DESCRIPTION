@@ -44,7 +44,7 @@ Suggests:
     tidyr,
     vcr (>= 0.6.0),
     webmockr
-URL: https://github.com/gomes-sh/SeattleOpenData
+URL: https://github.com/gomes-sh/SeattleOpenData, https://nyc-open-data-lab.github.io/SeattleOpenData/
 BugReports: https://github.com/gomes-sh/SeattleOpenData/issues
 VignetteBuilder: knitr
 Config/testthat/edition: 3
